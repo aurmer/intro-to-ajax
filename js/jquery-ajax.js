@@ -70,7 +70,52 @@
   //    get a new dog, click the button, get a new dog, etc.
   //
 
-  // TODO: your code goes here :)
+$('#generateDoggoBtn').click(clickDoggo)
+
+function clickDoggo() {
+  updateDoggoButton('working')
+  fetchDoggo()
+}
+
+
+function fetchDoggo() {
+  let url =  "https://dog.ceo/api/breeds/image/random"
+  let breed = $('#selectBreed').val()
+  if (breed !== "") {
+    url = `https://dog.ceo/api/breed/${breed}/images/random`
+  }
+
+  $.ajax({
+    dataType: "json",
+    url: url,
+    success: fetchDoggoSuccess,
+    error: fetchDoggoError,
+  });
+}
+
+function fetchDoggoSuccess(result) {
+  updateDoggoButton('ready')
+  $('#doggoContainer').html(`<img src="${result.message}">`)
+}
+
+function fetchDoggoError(error) {
+  updateDoggoButton('ready')
+  alert("Failed to get doggo, sorry 'bout that. \n\n" + error)
+  console.dir(error)
+}
+
+
+function updateDoggoButton(status) {
+  if(status === "ready") {
+    $('#generateDoggoBtn').html("Generate Doggo")
+    $('#generateDoggoBtn').prop('disabled', false)
+  } else if(status === "working") {
+    $('#generateDoggoBtn').html("Generating Doggo...")
+    $('#generateDoggoBtn').prop('disabled', true)
+  }
+}
+
+
 
   //
   // Cool. Now let's kick it up a notch and allow selecting a specific breed of dog!
@@ -106,7 +151,32 @@
   //    You should now be able to view random pictures of specific dog breeds via the menu!
   //
 
-  // TODO: your code goes here :)
+  $(document).ready(docReady)
+
+  function docReady() {
+    $.ajax({
+      dataType: "json",
+      url: "https://dog.ceo/api/breeds/list",
+      success: fetchBreedListSuccess,
+      error: fetchBreedListError,
+    });
+  }
+
+  function fetchBreedListSuccess(fetchResult) {
+    let breeds = fetchResult.message.reduce(renderBreedOption,'')
+    $('#selectBreedContainer').append(`<select id='selectBreed'><option value="">Select Breed</option>${breeds}</select>`)
+  }
+
+  function renderBreedOption(accumulator, breed) {
+    return accumulator + `<option value="${breed}">${breed}</option>`
+  }
+
+  function fetchBreedListError(error) {
+    alert("Failed to get breed list, sorry 'bout that. \n\n" + error)
+  }
+
+
+
 
   //
   // Excellent work!

@@ -9,3 +9,12 @@ h1 {
 #jumbotronContainer {
   margin-top: 20px;
 }
+
+#doggoContainer {
+  margin: 50px;
+}
+
+#doggoContainer>img {
+  max-width: 400px;
+  min-width: 400px;
+}
