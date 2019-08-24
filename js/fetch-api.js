@@ -1,3 +1,4 @@
+let foobar
 ;(function () {
   //
   // More recently, browsers have adopted the Fetch API in order to make AJAX easier
@@ -91,7 +92,67 @@
   //    it once done.
   //
 
-  // TODO: your code goes here :)
+    // HEADER x-api-key
+    // f700f864-5b42-473f-b8c6-f4061136c1bf
+  const myHeaders = new Headers({
+    'x-api-key': 'f700f864-5b42-473f-b8c6-f4061136c1bf'
+  });
+
+  let generateCatBtn = document.querySelector("#generateCatBtn")
+
+  generateCatBtn.addEventListener('click',clickCatButton)
+
+  function clickCatButton() {
+    document.querySelector('#catContainer').innerHTML = ""
+    toggleCatButtonDisabled()
+    fetchCatsList()
+  }
+
+  function toggleCatButtonDisabled() {
+    generateCatBtn.disabled = !generateCatBtn.disabled
+  }
+
+  function fetchCatsList() {
+    const catCount = document.querySelector('#cat-count').value
+    const url = `https://api.thecatapi.com/v1/images/search?size=full&mime_types=jpg&format=json&has_breeds=1&order=RANDOM&page=0&limit=${catCount}`
+
+    fetch(url,{
+      headers: myHeaders
+    })
+      .then(extractJSONFromResponse)
+      .then(renderMultipleCats)
+      .catch(fetchCatFail)
+  }
+
+  function extractJSONFromResponse(result) {
+    return result.json()
+  }
+
+  function renderMultipleCats(catsArray) {
+    catsArray.reduce(catArrayReducer, Promise.resolve())
+    toggleCatButtonDisabled()
+  }
+
+  function catArrayReducer(promiseChain,cat) {
+    return promiseChain.then(makeCatPromise.bind(null, cat))
+  }
+
+ function makeCatPromise(cat) {
+   return new Promise( function(resolve,reject) {
+    let catImg = new Image()
+    catImg.addEventListener('load', event => resolve(catImg))
+    catImg.addEventListener('error', event => reject(event))
+    catImg.src = cat.url
+    catImg.className = `cute-cat`
+    document.querySelector('#catContainer').appendChild(catImg)
+  })
+}
+
+  function fetchCatFail(error) {
+    toggleCatButtonDisabled()
+    console.log("~~~~ Fetch Cat failed ~~~~")
+    console.dir(error)
+  }
 
   //
   // What else can you build with your new AJAX knowledge?
